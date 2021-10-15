@@ -1,8 +1,6 @@
 name: Test Dagster Cloud CI action
-on:
-  push:
-    branches:
-      - main
+on: push
+
 jobs:
   build-and-sync:
     runs-on: ubuntu-latest

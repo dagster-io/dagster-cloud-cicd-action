@@ -89,13 +89,13 @@ jobs:
 ## Customization
 
 ### Inputs
-| Name                            | Description                                                                   |
-|---------------------------------|-------------------------------------------------------------------------------|
-| `registry` **(Required)**       | Docker registry to push to.                                                   |
-| `dagit-url` **(Required)**      | URL to your Dagit Cloud instance, including the deployment path.              |
-| `api-token` **(Required)**      | Dagster Cloud Agent API token.                                                |
-| `location-name` **(Required)**  | Name for the repo location to create or update.                               |
+| Name                            | Description                                                                                  |
+|---------------------------------|----------------------------------------------------------------------------------------------|
+| `registry`                      | **(Required)** Docker registry to push to.                                                   |
+| `dagit-url`                     | **(Required)** URL to your Dagit Cloud instance, including the deployment path.              |
+| `api-token`                     | **(Required)** Dagster Cloud Agent API token.                                                |
+| `location-name`                 | **(Required)** Name for the repo location to create or update.                               |
 | `python-file`                   | Python file where the repository lives in the built Docker image. One of `python-file` or `package-name` is required. |
 | `package-name`                  | Python package where the repository lives in the built Docker image. One of `python-file` or `package-name` is required. |
 | `build-path`                    | Path to the directory containing the Dockerfile from the root of the repository. Defaults to the root. |
-| `image-tag`                     | Tag for the built Docker image, defaults to the first 6 chars of git hash.    |
+| `image-tag`                     | Tag for the built Docker image, defaults to the first 6 chars of git hash.                   |

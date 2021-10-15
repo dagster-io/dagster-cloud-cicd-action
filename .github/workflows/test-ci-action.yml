@@ -22,6 +22,6 @@ jobs:
       - name: Run Dagster Cloud CI action
         uses: ./
         with:
-          location-file: ./test/non-existant.yaml
+          location-file: ./test/locations.yaml
           dagit-url: https://elementl.dogfood.dagster.cloud/dev
           api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}

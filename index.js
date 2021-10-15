@@ -28,7 +28,7 @@ async function run() {
       const locationsFile = fs.readFileSync(locationFile, 'utf8');
       return YAML.parse(locationsFile).locations;
     }).catch(error => {
-      core.error(`Error reading locations.yaml: ${error}`, file = locationFile);
+      core.error(`Error reading locations.yaml: ${error}`, file = locations);
     });
 
     const parallel = core.getBooleanInput('parallel');

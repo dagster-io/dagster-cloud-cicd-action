@@ -25,8 +25,8 @@ jobs:
           build-path: test
           registry: ${{ secrets.ECR_REPOSITORY }}
 
-          dagit-url: https://hooli.dagster.cloud/datascienceprod
+          dagit-url: https://elementl.dogfood.dagster.cloud/dev
           api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}
 
-          location-name: data-science-pipeline
+          location-name: github_action_demo_foo
           python-file: repo.py

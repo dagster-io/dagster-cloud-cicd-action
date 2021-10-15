@@ -1,24 +1,37 @@
 {
-  "name": "hello-world-javascript-action",
-  "version": "1.0.0",
-  "description": "This action prints \"Hello World\" or \"Hello\" + the name of a person to greet to the log.",
+  "name": "dagster-cloud-ci-action",
+  "version": "0.010",
+  "description": "Builds and pushes Dagster repo Docker images and updates the corresponding Dagster Cloud repo locations.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint .",
+    "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
+    "test": "jest",
+    "all": "npm run lint && npm run prepare && npm run test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/hello-world-javascript-action.git"
+    "url": "git+https://github.com/actions/javascript-action.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "JavaScript"
+  ],
+  "author": "Dagster",
+  "license": "Apache",
   "bugs": {
-    "url": "https://github.com/actions/hello-world-javascript-action/issues"
+    "url": "https://github.com/actions/dagster-cloud-ci-action/issues"
   },
-  "homepage": "https://github.com/actions/hello-world-javascript-action#readme",
+  "homepage": "https://github.com/actions/dagster-cloud-ci-action#readme",
   "dependencies": {
-    "@actions/core": "^1.1.0",
-    "@actions/github": "^1.1.0"
+    "@actions/core": "^1.2.5",
+    "@actions/exec": "^1.1.0",
+    "@actions/github": "^5.0.0"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.31.1",
+    "eslint": "^8.0.0",
+    "jest": "^27.2.5"
   }
 }

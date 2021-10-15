@@ -1,7 +1,6 @@
 # Dagster Cloud CI GitHub Action
 
-GitHub Action to build and push Docker images for Dagster repos, updating the corresponding
-Dagster Cloud repo locations.
+GitHub Action to update Dagster Cloud repo locations, building and pushing Docker images when pipeline code is updated.
 
 ## Usage
 

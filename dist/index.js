@@ -16393,6 +16393,8 @@ async function run() {
     const locations = await core.group('Read locations.yaml', async () => {
       const locationsFile = fs.readFileSync(locationFile, 'utf8');
       return YAML.parse(locationsFile).locations;
+    }).catch(error => {
+      core.error(`Error reading locations.yaml: ${error}`, file = locationFile);
     });
 
     const parallel = core.getBooleanInput('parallel');
@@ -16425,12 +16427,14 @@ async function run() {
 
       await process(locations, async ([locationName, location]) => {
         const imageName = `${location['registry']}:${imageTag}`;
+
         const pythonFile = location['python_file'];
         const packageName = location['package_name'];
         if (!(pythonFile || packageName) || (pythonFile && packageName)) {
           core.error(`Must provide exactly one of python_file or package_name on location ${locationName}.`)
         }
         const codeParams = pythonFile ? ['-f', pythonFile] : ['-p', packageName];
+
         await exec.exec('dagster-cloud',
           [
             'workspace',
@@ -16444,6 +16448,7 @@ async function run() {
         );
       });
     });
+
   } catch (error) {
     core.setFailed(error.message);
   }

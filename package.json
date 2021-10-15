@@ -2,10 +2,10 @@
   "name": "dagster-cloud-ci-action",
   "version": "0.010",
   "description": "Builds and pushes Dagster repo Docker images and updates the corresponding Dagster Cloud repo locations.",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "lint": "eslint .",
-    "prepare": "ncc build index.js -o dist --source-map --license licenses.txt",
+    "prepare": "ncc build src/index.js -o dist --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run lint && npm run prepare && npm run test"
   },
@@ -28,6 +28,7 @@
     "@actions/core": "^1.2.5",
     "@actions/exec": "^1.1.0",
     "@actions/github": "^5.0.0",
+    "graphql-request": "^3.6.0",
     "yaml": "^1.10.2"
   },
   "devDependencies": {

@@ -19,6 +19,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Cache Docker builds
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+
       - name: Run Dagster Cloud CI action
         uses: ./
         with:

@@ -3,10 +3,7 @@ const exec = require('@actions/exec');
 const github = require('@actions/github');
 const fs = require('fs');
 const YAML = require('yaml');
-
-async function installCloudCLI() {
-  await exec.exec('pip', ['install', 'dagster-cloud'])
-}
+const {DagsterCloudClient} = require('./dagsterCloud');
 
 async function inParallel(locations, processingFunction) {
   await Promise.all(Object.entries(locations).map(processingFunction));
@@ -38,7 +35,10 @@ async function run() {
       await process(locations, async ([_, location]) => {
         const imageName = `${location['registry']}:${imageTag}`;
         await exec.exec('docker',
-          ['build', '.', '-t', imageName],
+          [
+            'build', '.',
+            '-t', imageName
+          ],
           options = {'cwd': location['build']}
         );
       });
@@ -51,35 +51,38 @@ async function run() {
       });
     });
 
-    await core.group('Setup dagster cloud CLI', async () => {
-      await installCloudCLI();
-    });
-
     await core.group('Update workspace locations', async () => {
       const dagitUrl = core.getInput('dagit-url');
+      const endpoint = `${dagitUrl}/graphql`
+
       const apiToken = core.getInput('api-token');
 
-      await process(locations, async ([locationName, location]) => {
-        const imageName = `${location['registry']}:${imageTag}`;
+      const client = new DagsterCloudClient(endpoint, apiToken);
 
+      await process(locations, async ([locationName, location]) => {
         const pythonFile = location['python_file'];
         const packageName = location['package_name'];
         if (!(pythonFile || packageName) || (pythonFile && packageName)) {
           core.error(`Must provide exactly one of python_file or package_name on location ${locationName}.`)
         }
-        const codeParams = pythonFile ? ['-f', pythonFile] : ['-p', packageName];
 
-        await exec.exec('dagster-cloud',
-          [
-            'workspace',
-            'update-location', locationName,
-            '--upsert',
-            '--image', imageName,
-            ...codeParams,
-            '--url', dagitUrl,
-            '--api-token', apiToken
-          ]
-        );
+        // Optionally include some experimental git data in the location metadata
+        // used for some rich linking UI
+        const includeGitData = core.getBooleanInput('experimental-git-data');
+        const sha = github.context.sha;
+        const url = `https://github.com/${github.context.repo.owner}/`
+          + `${github.context.repo.repo}/tree/${sha}/${location['build']}`;
+
+        const locationData = {
+          name: locationName,
+          image: `${location['registry']}:${imageTag}`,
+          pythonFile: pythonFile,
+          packageName: packageName,
+          sha: includeGitData ? sha : undefined,
+          url: includeGitData ? url : undefined
+        }
+
+        const result = await client.updateLocation(locationData);
       });
     });
 

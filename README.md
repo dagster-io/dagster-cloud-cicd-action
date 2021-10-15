@@ -13,7 +13,8 @@ locations to be built and updated. If this `locations.yaml` file is not located 
 it must be specified with the `location-file` input.
 
 ### Example Job
-This example uses the [`docker/login-action`](https://github.com/docker/login-action) action to set up Docker registry access. ECR users may want to use the [`aws-actions/amazon-ecr-login`](https://github.com/aws-actions/amazon-ecr-login) action instead.
+This example uses the [`docker/login-action`](https://github.com/docker/login-action) action to set up Docker registry access. ECR users may want to use the [`aws-actions/amazon-ecr-login`](https://github.com/aws-actions/amazon-ecr-login) action instead. To speed up Docker builds, you may also
+use the [`satackey/action-docker-layer-caching`](https://github.com/satackey/action-docker-layer-caching) action.
 
 
 ```yaml

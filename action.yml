@@ -23,6 +23,10 @@ inputs:
     description: 'Whether to build and push all Docker images in parallel'
     required: false
     default: true
+
+  experimental-git-data:
+    required: false
+    default: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

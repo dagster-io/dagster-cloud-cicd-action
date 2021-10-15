@@ -2,7 +2,7 @@ name: Test Dagster Cloud CI action
 on: push
 
 jobs:
-  build-and-sync:
+  dagster-cloud-update-locations:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -22,11 +22,6 @@ jobs:
       - name: Run Dagster Cloud CI action
         uses: ./
         with:
-          build-path: test
-          registry: ${{ secrets.ECR_REPOSITORY }}
-
+          location-file: ./test/locations.yaml
           dagit-url: https://elementl.dogfood.dagster.cloud/dev
           api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}
-
-          location-name: github_action_demo_foo
-          python-file: repo.py

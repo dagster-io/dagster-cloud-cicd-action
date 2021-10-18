@@ -1,8 +1,8 @@
-name: Test Dagster Cloud CI action
+name: Requirements.txt Example
 on: push
 
 jobs:
-  dagster-cloud-update-locations:
+  requirements-txt-example:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -24,8 +24,10 @@ jobs:
         continue-on-error: true
 
       - name: Run Dagster Cloud CI action
+        # Here, use `uses: dagster-io/dagster-cloud-ci-action@{version}`
+        # e.g. `uses: dagster-io/dagster-cloud-ci-action@v0.1.0`
         uses: ./
         with:
-          location-file: ./test/locations.yaml
+          location-file: ./example/requirements-txt/locations.yaml
           dagit-url: https://elementl.dogfood.dagster.cloud/dev
           api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}

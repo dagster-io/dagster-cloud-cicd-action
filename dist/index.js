@@ -21646,8 +21646,13 @@ const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const github = __nccwpck_require__(5438);
 const fs = __nccwpck_require__(5747);
+const os = __nccwpck_require__(2087);
+const path = __nccwpck_require__(5622);
+const util = __nccwpck_require__(1669);
 const YAML = __nccwpck_require__(3552);
-const { DagsterCloudClient } = __nccwpck_require__(9529);
+const {DagsterCloudClient} = __nccwpck_require__(9529);
+
+const writeFileAsync = util.promisify(fs.writeFile);
 
 async function inParallel(locations, processingFunction) {
   await Promise.all(Object.entries(locations).map(processingFunction));
@@ -21657,6 +21662,25 @@ async function inSeries(locations, processingFunction) {
   for (const location of locations) {
     await processingFunction(location);
   }
+}
+
+function tmpDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'dagster-cloud-ci'));
+}
+
+async function writeRequirementsDockerfile(baseImage) {
+  const dockerfilePath = path.join(tmpDir(), 'Dockerfile');
+  await writeFileAsync(dockerfilePath, `
+FROM ${baseImage}
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+WORKDIR /opt/dagster/app
+
+COPY . /opt/dagster/app
+  `);
+  return dockerfilePath;
 }
 
 async function run() {
@@ -21677,14 +21701,38 @@ async function run() {
 
     await core.group('Build Docker images', async () => {
       await process(locations, async ([_, location]) => {
+        const basePath = path.parse(locationFile).dir;
+        const buildPath = path.join(basePath, location['build']);
+
+        let dockerfile = path.join(buildPath, 'Dockerfile');
+        const baseImage = location['base_image'];
+
+        if (!fs.existsSync(dockerfile)) {
+          const requirementsFile = path.join(buildPath, 'requirements.txt');
+
+          if (!fs.existsSync(requirementsFile) || !baseImage) {
+            core.error("Supplied build path must either contain Dockerfile, or requirements.txt with base_image");
+          }
+
+          dockerfile = await writeRequirementsDockerfile(baseImage);
+        } else {
+          if (baseImage) {
+            core.error("No need to specify base_image for location if build path contains Dockerfile");
+          }
+
+          dockerfile = './Dockerfile';
+        }
+
         const imageName = `${location['registry']}:${imageTag}`;
+
         await exec.exec('docker',
           [
             'build', '.',
             '--label', `sha=${github.context.sha}`,
+            '-f', dockerfile,
             '-t', imageName
           ],
-          options = { 'cwd': location['build'] }
+          options = {'cwd': buildPath}
         );
       });
     });

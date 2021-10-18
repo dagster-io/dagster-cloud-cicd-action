@@ -1,0 +1,6 @@
+locations:
+  github_action_demo_requirements_txt:
+    build: .
+    base_image: python:3.8-slim
+    registry: 764506304434.dkr.ecr.us-west-2.amazonaws.com/github-action-demo-req-txt
+    python_file: repo.py

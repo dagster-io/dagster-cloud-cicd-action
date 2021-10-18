@@ -1,9 +1,9 @@
 locations:
   github_action_demo_foo:
-    build: ./test/foo
+    build: ./foo
     registry: 764506304434.dkr.ecr.us-west-2.amazonaws.com/github-action-demo-foo
     python_file: repo.py
   github_action_demo_bar:
-    build: ./test/bar
+    build: ./bar
     registry: 764506304434.dkr.ecr.us-west-2.amazonaws.com/github-action-demo-bar
     python_file: repo.py

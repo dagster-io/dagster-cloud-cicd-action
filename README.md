@@ -1,6 +1,6 @@
 # Dagster Cloud CI GitHub Action
 
-GitHub Action to update Dagster Cloud repo locations, building and pushing Docker images when pipeline code is updated.
+GitHub Action to update Dagster Cloud code locations, building and pushing Docker images when pipeline code is updated.
 
 ## Usage
 
@@ -51,9 +51,13 @@ Dockerfiles located at `/foo_src/Dockerfile` and `/bar_src/Dockerfile`, and are 
 
 ```yaml
 locations:
+  # Location name
   foo:
+    # Path to build directory, which must contain a Dockerfile, relative to the locations.yaml folder
     build: ./foo_src
+    # Docker registry to push the built Docker image to
     registry: dagster-io/foo
+    # Python file containing the job repo - can alternatively supply python_module as below
     python_file: repo.py
   bar:
     build: ./bar_src
@@ -70,6 +74,6 @@ locations:
 |---------------------------------|----------------------------------------------------------------------------------------------|
 | `dagit-url`                     | **(Required)** URL to your Dagit Cloud instance, including the deployment path.              |
 | `api-token`                     | **(Required)** Dagster Cloud Agent API token.                                                |
-| `location-file`                 | Path to the `locations.yaml` file defining the repo locations to update. Defaults to `/locations.yaml` in the repo root. |
+| `location-file`                 | Path to the `locations.yaml` file defining the code locations to update. Defaults to `/locations.yaml` in the repo root. |
 | `image-tag`                     | Tag for the built Docker images, defaults to the first 6 chars of git hash.                  |
 | `parallel`                      | Whether to build and push Docker images in parallel. Defaults to `true`.                     |

@@ -21647,7 +21647,7 @@ const exec = __nccwpck_require__(1514);
 const github = __nccwpck_require__(5438);
 const fs = __nccwpck_require__(5747);
 const YAML = __nccwpck_require__(3552);
-const {DagsterCloudClient} = __nccwpck_require__(9529);
+const { DagsterCloudClient } = __nccwpck_require__(9529);
 
 async function inParallel(locations, processingFunction) {
   await Promise.all(Object.entries(locations).map(processingFunction));
@@ -21681,9 +21681,10 @@ async function run() {
         await exec.exec('docker',
           [
             'build', '.',
+            '--label', `sha=${github.context.sha}`,
             '-t', imageName
           ],
-          options = {'cwd': location['build']}
+          options = { 'cwd': location['build'] }
         );
       });
     });

@@ -132,6 +132,7 @@ async function run() {
         }
 
         const result = await client.updateLocation(locationData);
+        core.info(`Successfully updated location ${result}`);
       });
     });
 

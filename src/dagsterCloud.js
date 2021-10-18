@@ -58,10 +58,22 @@ export class DagsterCloudClient {
   async updateLocation(location) {
     const locationList = await this.gqlClient.request(LIST_LOCATION_QUERY);
     const locationNames = locationList.workspace.workspaceEntries.map(entry => entry.locationName);
+
+    let result;
     if (!locationNames.includes(location.name)) {
-      return await this.gqlClient.request(ADD_LOCATION_MUTATION, {"location": location});
+      result = (await this.gqlClient.request(ADD_LOCATION_MUTATION, {
+        "location": location
+      })).addLocation;
     } else {
-      return await this.gqlClient.request(UPDATE_LOCATION_MUTATION, {"location": location});
+      result = (await this.gqlClient.request(UPDATE_LOCATION_MUTATION, {
+        "location": location
+      })).updateLocation;
     }
+
+    if (result.__typename === "PythonError") {
+      throw new Error(result.message);
+    }
+
+    return result.locationName;
   }
 }

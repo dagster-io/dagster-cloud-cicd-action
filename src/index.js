@@ -3,7 +3,7 @@ const exec = require('@actions/exec');
 const github = require('@actions/github');
 const fs = require('fs');
 const YAML = require('yaml');
-const {DagsterCloudClient} = require('./dagsterCloud');
+const { DagsterCloudClient } = require('./dagsterCloud');
 
 async function inParallel(locations, processingFunction) {
   await Promise.all(Object.entries(locations).map(processingFunction));
@@ -37,9 +37,10 @@ async function run() {
         await exec.exec('docker',
           [
             'build', '.',
+            '--label', `sha=${github.context.sha}`,
             '-t', imageName
           ],
-          options = {'cwd': location['build']}
+          options = { 'cwd': location['build'] }
         );
       });
     });

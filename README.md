@@ -53,19 +53,30 @@ Dockerfiles located at `/foo_src/Dockerfile` and `/bar_src/Dockerfile`, and are 
 locations:
   # Location name
   foo:
-    # Path to build directory, which must contain a Dockerfile, relative to the locations.yaml folder
+
+    # Path to build directory, which must contain a Dockerfile or
+    # requirements.txt file, relative to the locations.yaml folder
     build: ./foo_src
+
+    # The base Docker image to use, if providing only a requirements.txt
+    # file and no Dockerfile
+    base_image: python:3.8-slim
+
     # Docker registry to push the built Docker image to
     registry: dagster-io/foo
-    # Python file containing the job repo - can alternatively supply python_module as below
+
+    # Python file containing the job repo
+    # Can alternatively supply python_module, as below
     python_file: repo.py
+
   bar:
     build: ./bar_src
     registry: dagster-io/bar
     python_module: bar
 ```
 
-
+### More Examples
+More examples are provided in the [`example` folder](./example).
 
 ## Customization
 

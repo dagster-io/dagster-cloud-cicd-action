@@ -1,6 +1,9 @@
 name: 'Dagster Cloud CI'
 description: |
   'Builds and pushes Dagster repo Docker images and updates the corresponding Dagster Cloud repo locations.'
+branding:
+  icon: 'git-pull-request'
+  color: 'green'
 inputs:
   dagit-url:
     description: 'Dagster Cloud Dagit URL'

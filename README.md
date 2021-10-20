@@ -2,6 +2,10 @@
 
 GitHub Action to update Dagster Cloud code locations, building and pushing Docker images when pipeline code is updated.
 
+## Quickstart
+
+Want to get started right away, or look at a functional example for reference? We provide a [quickstart template repo](https://github.com/dagster-io/dagster-cloud-ci-action-quickstart) which you can use to get CI for your Cloud instance up and running quickly.
+
 ## Usage
 
 This action requires that access to the target Docker registry is set up, and that the

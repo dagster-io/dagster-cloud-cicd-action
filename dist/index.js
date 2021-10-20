@@ -21775,8 +21775,9 @@ async function run() {
         // used for some rich linking UI
         const includeGitData = core.getBooleanInput('experimental-git-data');
         const sha = github.context.sha;
+        const shortSha = sha.substr(0, 6);
         const url = `https://github.com/${github.context.repo.owner}/`
-          + `${github.context.repo.repo}/tree/${sha}/${location['build']}`;
+          + `${github.context.repo.repo}/tree/${shortSha}/${location['build']}`;
 
         const locationData = {
           name: locationName,

@@ -23,9 +23,9 @@ jobs:
         uses: satackey/action-docker-layer-caching@v0.0.11
         continue-on-error: true
 
-      - name: Run Dagster Cloud CI action
-        # Here, use `uses: dagster-io/dagster-cloud-ci-action@{version}`
-        # e.g. `uses: dagster-io/dagster-cloud-ci-action@v0.1.0`
+      - name: Run Dagster Cloud CI/CD action
+        # Here, use `uses: dagster-io/dagster-cloud-cicd-action@{version}`
+        # e.g. `uses: dagster-io/dagster-cloud-cicd-action@v0.1.0`
         uses: ./
         with:
           location-file: ./example/requirements-txt/locations.yaml

@@ -1,5 +1,5 @@
 {
-  "name": "dagster-cloud-ci-action",
+  "name": "dagster-cloud-cicd-action",
   "version": "0.010",
   "description": "Builds and pushes Dagster repo Docker images and updates the corresponding Dagster Cloud repo locations.",
   "main": "src/index.js",
@@ -21,9 +21,9 @@
   "author": "Dagster",
   "license": "Apache",
   "bugs": {
-    "url": "https://github.com/actions/dagster-cloud-ci-action/issues"
+    "url": "https://github.com/actions/dagster-cloud-cicd-action/issues"
   },
-  "homepage": "https://github.com/actions/dagster-cloud-ci-action#readme",
+  "homepage": "https://github.com/actions/dagster-cloud-cicd-action#readme",
   "dependencies": {
     "@actions/core": "^1.2.5",
     "@actions/exec": "^1.1.0",

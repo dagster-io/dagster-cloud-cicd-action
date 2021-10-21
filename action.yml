@@ -1,4 +1,4 @@
-name: 'Dagster Cloud CI'
+name: 'Dagster Cloud CI/CD'
 description: |
   'Builds and pushes Dagster repo Docker images and updates the corresponding Dagster Cloud repo locations.'
 branding:

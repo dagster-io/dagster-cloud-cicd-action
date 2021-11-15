@@ -22200,12 +22200,16 @@ const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const github = __nccwpck_require__(5438);
 const { DagsterCloudClient } = __nccwpck_require__(9529);
-const { getProcess, getLocations, buildDockerImages } = __nccwpck_require__(1608);
+const {
+  getProcess,
+  getLocations,
+  buildDockerImages,
+  createCommentOnCommit,
+} = __nccwpck_require__(1608);
 
 async function run() {
   try {
-    const imageTag =
-      core.getInput("image-tag") || github.context.sha.substring(0, 6);
+    const imageTag = github.context.sha.substring(0, 6);
 
     const locationFile = core.getInput("location-file");
 
@@ -22216,20 +22220,26 @@ async function run() {
 
     await buildDockerImages(process, locationFile, locations, imageTag);
 
-    await core.group("Push Docker image", async () => {
-      await process(locations, async ([_, location]) => {
-        const imageName = `${location["registry"]}:${imageTag}`;
-        await exec.exec("docker", ["push", imageName]);
-      });
-    });
-
-    await core.group("Update workspace locations", async () => {
+    await core.group("Create code preview", async () => {
       const dagitUrl = core.getInput("dagit-url");
       const endpoint = `${dagitUrl}/graphql`;
 
       const apiToken = core.getInput("api-token");
 
       const client = new DagsterCloudClient(endpoint, apiToken);
+
+      core.info(github.context.pull_request);
+
+      const commitSha = github.context.payload.pull_request.head.sha;
+      const codePreview = {
+        commitMessage: github.context.payload.pull_request.head.label,
+        branchName: github.context.payload.pull_request.head.ref,
+        branchUrl: github.context.payload.pull_request.html_url,
+        commitSha: commitSha,
+        commitUrl: `${github.context.payload.pull_request.html_url}/commits/${commitSha}`,
+      };
+
+      const codePreviewId = await client.createCodePreview(codePreview);
 
       await process(locations, async ([locationName, location]) => {
         const pythonFile = location["python_file"];
@@ -22247,30 +22257,44 @@ async function run() {
           );
         }
 
-        // Optionally include some experimental git data in the location metadata
-        // used for some rich linking UI
-        const includeGitData = core.getBooleanInput("experimental-git-data");
-        const sha = github.context.sha;
-        const shortSha = sha.substr(0, 6);
-        const url =
-          `https://github.com/${github.context.repo.owner}/` +
-          `${github.context.repo.repo}/tree/${shortSha}/${location["build"]}`;
+        const imageName = `${location["registry"]}:${imageTag}`;
+        const pythonFileArg = pythonFile ? ["--python-file", pythonFile] : [];
+        const packageNameArg = packageName ? ["--package-name", packageName] : [];
+        const moduleNameArg = moduleName ? ["--module-name", moduleName] : [];
+        const workingDirectoryArg = workingDirectory ? ["--working-directory", workingDirectory]: [];
+        const executablePathArg = executablePath ? ["--executable-path", executablePath] : [];
+        const attributeArg = attribute ? ["--attribute", attribute] : [];
 
-        const locationData = {
-          name: locationName,
-          image: `${location["registry"]}:${imageTag}`,
-          pythonFile: pythonFile,
-          packageName: packageName,
-          moduleName: moduleName,
-          workingDirectory: workingDirectory,
-          executablePath: executablePath,
-          attribute: attribute,
-          sha: includeGitData ? sha : undefined,
-          url: includeGitData ? url : undefined,
-        };
+        await exec.exec(
+          "docker",
+          [
+            "run",
+            imageName,
+            "dagster-cloud",
+            "workspace",
+            "snapshot",
+            locationName,
+            codePreviewId,
+            "--url",
+            dagitUrl,
+            "--api-token",
+            apiToken,
+            "--image",
+            imageName,
+          ]
+            .concat(pythonFileArg)
+            .concat(packageNameArg)
+            .concat(moduleNameArg)
+            .concat(workingDirectoryArg)
+            .concat(executablePathArg)
+            .concat(attributeArg)
+        );
 
-        const result = await client.updateLocation(locationData);
-        core.info(`Successfully updated location ${result}`);
+        core.info(
+          `Successfully created repository location for code preview ${codePreviewId}`
+        );
+
+        await createCommentOnCommit(codePreviewId);
       });
     });
   } catch (error) {

@@ -41,6 +41,21 @@ const UPDATE_LOCATION_MUTATION = gql`
   }
 `;
 
+const CREATE_CODE_PREVIEW_MUTATION = gql`
+mutation ($codePreview: CodePreviewInput!) {
+  createCodePreview(codePreview: $codePreview) {
+    __typename
+    ... on CodePreview {
+      id
+    }
+    ... on PythonError {
+      message
+      stack
+    }
+  }
+}
+`
+
 export class DagsterCloudClient {
   constructor(url, token) {
     this.url = url;
@@ -79,5 +94,17 @@ export class DagsterCloudClient {
     }
 
     return result.locationName;
+  }
+
+  async createCodePreview(codePreview) {
+    const result = (await this.gqlClient.request(CREATE_CODE_PREVIEW_MUTATION, {
+      "codePreview": codePreview
+    })).createCodePreview;
+
+    if (result.__typename === "PythonError") {
+      throw new Error(result.message);
+    }
+
+    return result.id;
   }
 }

@@ -1,0 +1,27 @@
+name: 'Dagster Cloud CI/CD'
+description: |
+  'Builds the Dagster repo Docker images and creates a preview link to view the Dagster Cloud repo locations.'
+branding:
+  icon: 'eye'
+  color: 'white'
+inputs:
+  github-token:
+    description: 'Github API token'
+    required: true
+  dagit-url:
+    description: 'Dagster Cloud Dagit URL'
+    required: true
+  api-token:
+    description: 'Cloud Agent API token'
+    required: true
+  location-file:
+    description: 'Path to the locations.yaml file defining the repo locations to update'
+    required: true
+    default: 'locations.yaml'
+  parallel:
+    description: 'Whether to build and push all Docker images in parallel'
+    required: false
+    default: true
+runs:
+  using: 'node12'
+  main: '../dist/preview/index.js'

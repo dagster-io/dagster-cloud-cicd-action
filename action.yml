@@ -30,6 +30,19 @@ inputs:
   experimental-git-data:
     required: false
     default: false
+
+  SNOWFLAKE_USER:
+    required: false
+    default: ''
+  
+  SNOWFLAKE_ACCOUNT:
+    required: false
+    default: ''
+
+  SNOWFLAKE_PASSWORD:
+    required: false
+    default: ''
+    
 runs:
   using: 'node12'
   main: 'dist/index.js'

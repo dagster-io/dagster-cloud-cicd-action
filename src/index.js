@@ -86,6 +86,10 @@ async function run() {
             'build', '.',
             '--label', `sha=${github.context.sha}`,
             '-f', dockerfile,
+            // Brutal hack to get secrets into a container for ECS
+            '--build-arg', `SNOWFLAKE_USER=${core.getInput("SNOWFLAKE_USER")}`,
+            '--build-arg', `SNOWFLAKE_ACCOUNT=${core.getInput("SNOWFLAKE_ACCOUNT")}`,
+            '--build-arg', `SNOWFLAKE_PASSWORD=${core.getInput("SNOWFLAKE_PASSWORD")}`,
             '-t', imageName
           ],
           options = {'cwd': buildPath}

@@ -1,29 +1,29 @@
-name: 'Dagster Cloud CI/CD'
+name: "Dagster Cloud CI/CD"
 description: |
   'Builds and pushes Dagster repo Docker images and updates the corresponding Dagster Cloud repo locations.'
 branding:
-  icon: 'git-pull-request'
-  color: 'green'
+  icon: "git-pull-request"
+  color: "green"
 inputs:
   dagit-url:
-    description: 'Dagster Cloud Dagit URL'
+    description: "Dagster Cloud Dagit URL"
     required: true
   api-token:
-    description: 'Cloud Agent API token'
+    description: "Cloud Agent API token"
     required: true
 
   location-file:
-    description: 'Path to the locations.yaml file defining the repo locations to update'
+    description: "Path to the locations.yaml file defining the repo locations to update"
     required: true
-    default: 'locations.yaml'
+    default: "locations.yaml"
 
   image-tag:
-    description: 'Tag for the built Docker images, defaults to first 6 chars of git hash'
+    description: "Tag for the built Docker images, defaults to first 6 chars of git hash"
     required: false
-    default: ''
+    default: ""
 
   parallel:
-    description: 'Whether to build and push all Docker images in parallel'
+    description: "Whether to build and push all Docker images in parallel"
     required: false
     default: true
 
@@ -33,20 +33,24 @@ inputs:
 
   SNOWFLAKE_USER:
     required: false
-    default: ''
-  
+    default: ""
+
   SNOWFLAKE_ACCOUNT:
     required: false
-    default: ''
+    default: ""
 
   SNOWFLAKE_PASSWORD:
     required: false
-    default: ''
+    default: ""
 
   SLACK_TOKEN:
     required: false
-    default: ''
+    default: ""
+
+  CROSS_DEPLOYMENT_API_TOKEN:
+    required: false
+    default: ""
 
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"

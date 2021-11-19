@@ -21747,6 +21747,7 @@ async function run() {
             '--build-arg', `SNOWFLAKE_ACCOUNT=${core.getInput("SNOWFLAKE_ACCOUNT")}`,
             '--build-arg', `SNOWFLAKE_PASSWORD=${core.getInput("SNOWFLAKE_PASSWORD")}`,
             '--build-arg', `SLACK_TOKEN=${core.getInput("SLACK_TOKEN")}`,
+            '--build-arg', `CROSS_DEPLOYMENT_API_TOKEN=${core.getInput("CROSS_DEPLOYMENT_API_TOKEN")}`,
             '-t', imageName
           ],
           options = {'cwd': buildPath}

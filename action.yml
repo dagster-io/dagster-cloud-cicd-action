@@ -42,7 +42,11 @@ inputs:
   SNOWFLAKE_PASSWORD:
     required: false
     default: ''
-    
+
+  SLACK_TOKEN:
+    required: false
+    default: ''
+
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -7,3 +7,4 @@ This folder contains a number of examples of potential use cases of the Dagster 
 file instead of a Dockerfile.
 - [`multiple-locations`](./multiple-locations): An example containing multiple code locations,
 which are built and pushed separately.
+- [`docker-target-stage`](./docker-target-stage): An example which specifies the [Docker target stage](https://docs.docker.com/develop/develop-images/multistage-build/) to build in a multistage Dockerfile.

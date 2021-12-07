@@ -21737,13 +21737,19 @@ async function run() {
 
         const imageName = `${location['registry']}:${imageTag}`;
 
+        let dockerArguments = [
+          'build', '.',
+          '--label', `sha=${github.context.sha}`,
+          '-f', dockerfile,
+          '-t', imageName
+        ];
+        
+        if (location['target']) {
+          dockerArguments = dockerArguments.concat(['--target', location['target']]);
+        }
+
         await exec.exec('docker',
-          [
-            'build', '.',
-            '--label', `sha=${github.context.sha}`,
-            '-f', dockerfile,
-            '-t', imageName
-          ],
+          dockerArguments,
           options = {'cwd': buildPath}
         );
       });

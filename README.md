@@ -70,13 +70,13 @@ locations:
     registry: dagster-io/foo
 
     # Python file containing the job repo
-    # Can alternatively supply python_module, as below
+    # Can alternatively supply package_name, as below
     python_file: repo.py
 
   bar:
     build: ./bar_src
     registry: dagster-io/bar
-    python_module: bar
+    package_name: bar
 ```
 
 ### More Examples
@@ -92,6 +92,18 @@ More examples are provided in the [`example` folder](./example).
 | `location-file`                 | Path to the `locations.yaml` file defining the code locations to update. Defaults to `/locations.yaml` in the repo root. |
 | `image-tag`                     | Tag for the built Docker images, defaults to the first 6 chars of git hash.                  |
 | `parallel`                      | Whether to build and push Docker images in parallel. Defaults to `true`.                     |
+
+### `locations.yaml` Properties
+Each location specified in the `locations.yaml` can have the following properties:
+
+| Name                            | Description                                                                                  |
+|---------------------------------|----------------------------------------------------------------------------------------------|
+| `build`                         | **(Required)** Path to the build directory relative to the `locations.yaml`'s folder. Build directory must contain a `Dockerfile` or `requirements.txt` file.|
+| `registry`                      | **(Required)** Docker registry to push the built Docker image to.                            |
+| `package_name`                  | Python module containing the [Dagster Repository](https://docs.dagster.io/concepts/repositories-workspaces/repositories). Can alternatively use `python_file` below.|
+| `python_file`                   | Python file containing the [Dagster Repository](https://docs.dagster.io/concepts/repositories-workspaces/repositories). Can alternatively use `package_name` above.|
+| `base_image`                    | If the build directory only contains a `requirements.txt` file and no `Dockerfile`, specifies the base Docker image to use to build the code location.|
+| `target`                        | If providing a multistage `Dockerfile`, can be used to specify the [target stage](https://docs.docker.com/develop/develop-images/multistage-build/) to build.|
 
 
 ## Developing the CI/CD Action

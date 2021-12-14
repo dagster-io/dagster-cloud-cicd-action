@@ -25,3 +25,8 @@ def other_foo_pipeline():
 @repository
 def foo_repo():
     return [foo_pipeline]
+
+
+@repository
+def other_foo_repo():
+    return [other_foo_pipeline]

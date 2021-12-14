@@ -21343,49 +21343,47 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
 /* harmony export */   "DagsterCloudClient": () => (/* binding */ DagsterCloudClient)
 /* harmony export */ });
-const {GraphQLClient, gql} = __nccwpck_require__(2476);
-
-
+const { GraphQLClient, gql } = __nccwpck_require__(2476);
 
 const LIST_LOCATION_QUERY = gql`
-query WorkspaceEntries {
+  query WorkspaceEntries {
     workspace {
-        workspaceEntries {
-            locationName
-            serializedDeploymentMetadata
-        }
+      workspaceEntries {
+        locationName
+        serializedDeploymentMetadata
+      }
     }
-}
+  }
 `;
 
 const ADD_LOCATION_MUTATION = gql`
-mutation ($location: LocationSelector!) {
-  addLocation(location: $location) {
-     __typename
-     ... on WorkspaceEntry {
-       locationName
-     }
-     ... on PythonError {
-       message
-       stack
-     }
+  mutation ($location: LocationSelector!) {
+    addLocation(location: $location) {
+      __typename
+      ... on WorkspaceEntry {
+        locationName
+      }
+      ... on PythonError {
+        message
+        stack
+      }
+    }
   }
-}
 `;
 
 const UPDATE_LOCATION_MUTATION = gql`
-mutation ($location: LocationSelector!) {
-  updateLocation(location: $location) {
-     __typename
-     ... on WorkspaceEntry {
-       locationName
-     }
-     ... on PythonError {
-       message
-       stack
-     }
+  mutation ($location: LocationSelector!) {
+    updateLocation(location: $location) {
+      __typename
+      ... on WorkspaceEntry {
+        locationName
+      }
+      ... on PythonError {
+        message
+        stack
+      }
+    }
   }
-}
 `;
 
 class DagsterCloudClient {
@@ -21402,17 +21400,23 @@ class DagsterCloudClient {
 
   async updateLocation(location) {
     const locationList = await this.gqlClient.request(LIST_LOCATION_QUERY);
-    const locationNames = locationList.workspace.workspaceEntries.map(entry => entry.locationName);
+    const locationNames = locationList.workspace.workspaceEntries.map(
+      (entry) => entry.locationName
+    );
 
     let result;
     if (!locationNames.includes(location.name)) {
-      result = (await this.gqlClient.request(ADD_LOCATION_MUTATION, {
-        "location": location
-      })).addLocation;
+      result = (
+        await this.gqlClient.request(ADD_LOCATION_MUTATION, {
+          location: location,
+        })
+      ).addLocation;
     } else {
-      result = (await this.gqlClient.request(UPDATE_LOCATION_MUTATION, {
-        "location": location
-      })).updateLocation;
+      result = (
+        await this.gqlClient.request(UPDATE_LOCATION_MUTATION, {
+          location: location,
+        })
+      ).updateLocation;
     }
 
     if (result.__typename === "PythonError") {
@@ -21422,6 +21426,7 @@ class DagsterCloudClient {
     return result.locationName;
   }
 }
+
 
 /***/ }),
 
@@ -21662,7 +21667,7 @@ const os = __nccwpck_require__(2087);
 const path = __nccwpck_require__(5622);
 const util = __nccwpck_require__(1669);
 const YAML = __nccwpck_require__(3552);
-const {DagsterCloudClient} = __nccwpck_require__(9529);
+const { DagsterCloudClient } = __nccwpck_require__(9529);
 
 const writeFileAsync = util.promisify(fs.writeFile);
 
@@ -21677,12 +21682,14 @@ async function inSeries(locations, processingFunction) {
 }
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'dagster-cloud-ci'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "dagster-cloud-ci"));
 }
 
 async function writeRequirementsDockerfile(baseImage) {
-  const dockerfilePath = path.join(tmpDir(), 'Dockerfile');
-  await writeFileAsync(dockerfilePath, `
+  const dockerfilePath = path.join(tmpDir(), "Dockerfile");
+  await writeFileAsync(
+    dockerfilePath,
+    `
 FROM ${baseImage}
 
 COPY requirements.txt .
@@ -21691,120 +21698,148 @@ RUN pip install -r requirements.txt
 WORKDIR /opt/dagster/app
 
 COPY . /opt/dagster/app
-  `);
+  `
+  );
   return dockerfilePath;
 }
 
 async function run() {
   try {
-    const imageTag = core.getInput('image-tag') || github.context.sha.substring(0, 6);
+    const imageTag =
+      core.getInput("image-tag") || github.context.sha.substring(0, 6);
 
-    const locationFile = core.getInput('location-file');
+    const locationFile = core.getInput("location-file");
 
-    const locations = await core.group('Read locations.yaml', async () => {
-      const locationsFile = fs.readFileSync(locationFile, 'utf8');
-      return YAML.parse(locationsFile).locations;
-    }).catch(error => {
-      core.error(`Error reading locations.yaml: ${error}`, file = locations);
-    });
+    const locations = await core
+      .group("Read locations.yaml", async () => {
+        const locationsFile = fs.readFileSync(locationFile, "utf8");
+        return YAML.parse(locationsFile).locations;
+      })
+      .catch((error) => {
+        core.error(`Error reading locations.yaml: ${error}`, {
+          file: locations,
+        });
+      });
 
-    const parallel = core.getBooleanInput('parallel');
+    const parallel = core.getBooleanInput("parallel");
     const process = parallel ? inParallel : inSeries;
 
-    await core.group('Build Docker images', async () => {
+    await core.group("Build Docker images", async () => {
       await process(locations, async ([_, location]) => {
         const basePath = path.parse(locationFile).dir;
-        const buildPath = path.join(basePath, location['build']);
+        const buildPath = path.join(basePath, location["build"]);
 
-        let dockerfile = path.join(buildPath, 'Dockerfile');
-        const baseImage = location['base_image'];
+        let dockerfile = path.join(buildPath, "Dockerfile");
+        const baseImage = location["base_image"];
 
         if (!fs.existsSync(dockerfile)) {
-          const requirementsFile = path.join(buildPath, 'requirements.txt');
+          const requirementsFile = path.join(buildPath, "requirements.txt");
 
           if (!fs.existsSync(requirementsFile) || !baseImage) {
-            core.error("Supplied build path must either contain Dockerfile, or requirements.txt with base_image");
+            core.error(
+              "Supplied build path must either contain Dockerfile, or requirements.txt with base_image"
+            );
           }
 
           dockerfile = await writeRequirementsDockerfile(baseImage);
         } else {
           if (baseImage) {
-            core.error("No need to specify base_image for location if build path contains Dockerfile");
+            core.error(
+              "No need to specify base_image for location if build path contains Dockerfile"
+            );
           }
 
-          dockerfile = './Dockerfile';
+          dockerfile = "./Dockerfile";
         }
 
-        const imageName = `${location['registry']}:${imageTag}`;
+        const imageName = `${location["registry"]}:${imageTag}`;
 
         let dockerArguments = [
-          'build', '.',
-          '--label', `sha=${github.context.sha}`,
-          '-f', dockerfile,
-          '-t', imageName
+          "build",
+          ".",
+          "--label",
+          `sha=${github.context.sha}`,
+          "-f",
+          dockerfile,
+          "-t",
+          imageName,
         ];
-        
-        if (location['target']) {
-          dockerArguments = dockerArguments.concat(['--target', location['target']]);
+
+        if (location["target"]) {
+          dockerArguments = dockerArguments.concat([
+            "--target",
+            location["target"],
+          ]);
         }
 
-        await exec.exec('docker',
-          dockerArguments,
-          options = {'cwd': buildPath}
-        );
+        await exec.exec("docker", dockerArguments, { cwd: buildPath });
       });
     });
 
-    await core.group('Push Docker image', async () => {
+    await core.group("Push Docker image", async () => {
       await process(locations, async ([_, location]) => {
-        const imageName = `${location['registry']}:${imageTag}`;
-        await exec.exec('docker', ['push', imageName]);
+        const imageName = `${location["registry"]}:${imageTag}`;
+        await exec.exec("docker", ["push", imageName]);
       });
     });
 
-    await core.group('Update workspace locations', async () => {
-      const dagitUrl = core.getInput('dagit-url');
-      const endpoint = `${dagitUrl}/graphql`
+    await core.group("Update workspace locations", async () => {
+      const dagitUrl = core.getInput("dagit-url");
+      const endpoint = `${dagitUrl}/graphql`;
 
-      const apiToken = core.getInput('api-token');
+      const apiToken = core.getInput("api-token");
 
       const client = new DagsterCloudClient(endpoint, apiToken);
 
       await process(locations, async ([locationName, location]) => {
-        const pythonFile = location['python_file'];
-        const packageName = location['package_name'];
-        if (!(pythonFile || packageName) || (pythonFile && packageName)) {
-          core.error(`Must provide exactly one of python_file or package_name on location ${locationName}.`)
+        const pythonFile = location["python_file"];
+        const packageName = location["package_name"];
+        const moduleName = location["module_name"];
+        const workingDirectory = location["working_directory"];
+        const executablePath = location["executable_path"];
+        const attribute = location["attribute"];
+
+        if (
+          [pythonFile, packageName, moduleName].filter((x) => !!x).length != 1
+        ) {
+          core.error(
+            `Must provide exactly one of python_file, package_name, or module_name on location ${locationName}.`
+          );
         }
 
         // Optionally include some experimental git data in the location metadata
         // used for some rich linking UI
-        const includeGitData = core.getBooleanInput('experimental-git-data');
+        const includeGitData = core.getBooleanInput("experimental-git-data");
         const sha = github.context.sha;
         const shortSha = sha.substr(0, 6);
-        const url = `https://github.com/${github.context.repo.owner}/`
-          + `${github.context.repo.repo}/tree/${shortSha}/${location['build']}`;
+        const url =
+          `https://github.com/${github.context.repo.owner}/` +
+          `${github.context.repo.repo}/tree/${shortSha}/${location["build"]}`;
 
         const locationData = {
           name: locationName,
-          image: `${location['registry']}:${imageTag}`,
+          image: `${location["registry"]}:${imageTag}`,
           pythonFile: pythonFile,
           packageName: packageName,
+          moduleName: moduleName,
+          workingDirectory: workingDirectory,
+          executablePath: executablePath,
+          attribute: attribute,
           sha: includeGitData ? sha : undefined,
-          url: includeGitData ? url : undefined
-        }
+          url: includeGitData ? url : undefined,
+        };
 
         const result = await client.updateLocation(locationData);
         core.info(`Successfully updated location ${result}`);
       });
     });
-
   } catch (error) {
     core.setFailed(error.message);
   }
 }
 
 run();
+
 })();
 
 module.exports = __webpack_exports__;

@@ -1,6 +1,6 @@
 FROM python:3.8-slim AS first-stage
 
-ENV DAGSTER_VERSION=0.12.14
+ENV DAGSTER_VERSION=0.13.12
 
 RUN pip install \
     dagster==${DAGSTER_VERSION} \

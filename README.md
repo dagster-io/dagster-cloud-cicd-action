@@ -17,9 +17,9 @@ locations to be built and updated. If this `locations.yaml` file is not located 
 it must be specified with the `location-file` input.
 
 ### Example Job
+
 This example uses the [`docker/login-action`](https://github.com/docker/login-action) action to set up Docker registry access. ECR users may want to use the [`aws-actions/amazon-ecr-login`](https://github.com/aws-actions/amazon-ecr-login) action instead. To speed up Docker builds, you may also
 use the [`satackey/action-docker-layer-caching`](https://github.com/satackey/action-docker-layer-caching) action.
-
 
 ```yaml
 on:
@@ -48,6 +48,7 @@ jobs:
 ```
 
 ### Example `locations.yaml`
+
 This locations file indicates that two locations, `foo` and `bar`, should be built. These
 locations have
 Dockerfiles located at `/foo_src/Dockerfile` and `/bar_src/Dockerfile`, and are pushed to the
@@ -57,7 +58,6 @@ Dockerfiles located at `/foo_src/Dockerfile` and `/bar_src/Dockerfile`, and are 
 locations:
   # Location name
   foo:
-
     # Path to build directory, which must contain a Dockerfile or
     # requirements.txt file, relative to the locations.yaml folder
     build: ./foo_src
@@ -80,31 +80,37 @@ locations:
 ```
 
 ### More Examples
+
 More examples are provided in the [`example` folder](./example).
 
 ## Customization
 
 ### Inputs
-| Name                            | Description                                                                                  |
-|---------------------------------|----------------------------------------------------------------------------------------------|
-| `dagit-url`                     | **(Required)** URL to your Dagit Cloud instance, including the deployment path.              |
-| `api-token`                     | **(Required)** Dagster Cloud Agent API token.                                                |
-| `location-file`                 | Path to the `locations.yaml` file defining the code locations to update. Defaults to `/locations.yaml` in the repo root. |
-| `image-tag`                     | Tag for the built Docker images, defaults to the first 6 chars of git hash.                  |
-| `parallel`                      | Whether to build and push Docker images in parallel. Defaults to `true`.                     |
+
+| Name            | Description                                                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `dagit-url`     | **(Required)** URL to your Dagit Cloud instance, including the deployment path.                                          |
+| `api-token`     | **(Required)** Dagster Cloud Agent API token.                                                                            |
+| `location-file` | Path to the `locations.yaml` file defining the code locations to update. Defaults to `/locations.yaml` in the repo root. |
+| `image-tag`     | Tag for the built Docker images, defaults to the first 6 chars of git hash.                                              |
+| `parallel`      | Whether to build and push Docker images in parallel. Defaults to `true`.                                                 |
 
 ### `locations.yaml` Properties
+
 Each location specified in the `locations.yaml` can have the following properties:
 
-| Name                            | Description                                                                                  |
-|---------------------------------|----------------------------------------------------------------------------------------------|
-| `build`                         | **(Required)** Path to the build directory relative to the `locations.yaml`'s folder. Build directory must contain a `Dockerfile` or `requirements.txt` file.|
-| `registry`                      | **(Required)** Docker registry to push the built Docker image to.                            |
-| `package_name`                  | Python module containing the [Dagster Repository](https://docs.dagster.io/concepts/repositories-workspaces/repositories). Can alternatively use `python_file` below.|
-| `python_file`                   | Python file containing the [Dagster Repository](https://docs.dagster.io/concepts/repositories-workspaces/repositories). Can alternatively use `package_name` above.|
-| `base_image`                    | If the build directory only contains a `requirements.txt` file and no `Dockerfile`, specifies the base Docker image to use to build the code location.|
-| `target`                        | If providing a multistage `Dockerfile`, can be used to specify the [target stage](https://docs.docker.com/develop/develop-images/multistage-build/) to build.|
-
+| Name                | Description                                                                                                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `build`             | **(Required)** Path to the build directory relative to the `locations.yaml`'s folder. Build directory must contain a `Dockerfile` or `requirements.txt` file.                              |
+| `registry`          | **(Required)** Docker registry to push the built Docker image to.                                                                                                                          |
+| `package_name`      | Installed Python package containing the [Dagster Repository](https://docs.dagster.io/concepts/repositories-workspaces/repositories). Can alternatively use `python_file` or `module_name`. |
+| `module_name`       | Python module containing the [Dagster Repository](https://docs.dagster.io/concepts/repositories-workspaces/repositories). Can alternatively use `python_file` or `package_name`.           |
+| `python_file`       | Python file containing the [Dagster Repository](https://docs.dagster.io/concepts/repositories-workspaces/repositories). Can alternatively use `package_name` or `module_name`.             |
+| `working_directory` | (Optional) Working directory to use for importing Python modules when loading the repository. Can only be used with `python-file`.                                                         |
+| `executable_path`   | (Optional) Path to reach the executable to use for the Python environment to load the repostiroy. Defaults to the installed `dagster` command-line entry point.                            |
+| `attribute`         | (Optional) Specifies either a repository or a function that returns a repository. Can be used when the code contains multiple repositories but only one should be included.                |
+| `base_image`        | If the build directory only contains a `requirements.txt` file and no `Dockerfile`, specifies the base Docker image to use to build the code location.                                     |
+| `target`            | If providing a multistage `Dockerfile`, can be used to specify the [target stage](https://docs.docker.com/develop/develop-images/multistage-build/) to build.                              |
 
 ## Developing the CI/CD Action
 

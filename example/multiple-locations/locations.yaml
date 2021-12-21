@@ -2,8 +2,16 @@ locations:
   github_action_demo_foo:
     build: ./foo
     registry: 764506304434.dkr.ecr.us-west-2.amazonaws.com/github-action-demo-foo
-    python_file: repo.py
+    package_name: foo
+    attribute: foo_repo
+  github_action_demo_other_foo:
+    build: ./foo
+    registry: 764506304434.dkr.ecr.us-west-2.amazonaws.com/github-action-demo-foo
+    module_name: foo
+    attribute: other_foo_repo
   github_action_demo_bar:
     build: ./bar
     registry: 764506304434.dkr.ecr.us-west-2.amazonaws.com/github-action-demo-bar
     python_file: repo.py
+    working_directory: /opt/dagster/app
+    executable_path: python

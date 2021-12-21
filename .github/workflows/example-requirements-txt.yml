@@ -25,7 +25,7 @@ jobs:
 
       - name: Run Dagster Cloud CI/CD action
         # Here, use `uses: dagster-io/dagster-cloud-cicd-action@{version}`
-        # e.g. `uses: dagster-io/dagster-cloud-cicd-action@v0.1.1`
+        # e.g. `uses: dagster-io/dagster-cloud-cicd-action@v0.1.2`
         uses: ./
         with:
           location-file: ./example/requirements-txt/locations.yaml

@@ -24,9 +24,9 @@ jobs:
         continue-on-error: true
 
       - name: Run Dagster Cloud CI/CD action
-        # Here, use `uses: dagster-io/dagster-cloud-cicd-action@{version}`
-        # e.g. `uses: dagster-io/dagster-cloud-cicd-action@v0.1.2`
-        uses: ./
+        # Here, use `uses: dagster-io/dagster-cloud-cicd-action/deploy@{version}`
+        # e.g. `uses: dagster-io/dagster-cloud-cicd-action/deploy@v0.1.2`
+        uses: ./deploy
         with:
           location-file: ./example/multiple-locations/locations.yaml
           dagit-url: https://elementl.dogfood.dagster.cloud/dev

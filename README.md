@@ -41,7 +41,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build images & update Dagster Cloud
-        uses: dagster-io/dagster-cloud-cicd-action@v0.1.2
+        uses: dagster-io/dagster-cloud-cicd-action/deploy@v0.2.0
         with:
           dagit-url: https://hooli.dagster.cloud/prod
           api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}

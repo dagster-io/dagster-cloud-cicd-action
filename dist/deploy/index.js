@@ -21942,8 +21942,7 @@ async function run() {
           );
         }
 
-        // Optionally include some git data in the location metadata
-        // used for some rich linking UI
+        // Git metadata, used for rich linkbacks
         const sha = github.context.sha;
         const shortSha = sha.substr(0, 6);
         const url =

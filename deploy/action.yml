@@ -27,10 +27,6 @@ inputs:
     required: false
     default: true
 
-  include-git-metadata:
-    description: 'Whether to include GitHub metadata, including commit SHA and backlink'
-    required: false
-    default: true
 runs:
   using: 'node12'
   main: '../dist/deploy/index.js'

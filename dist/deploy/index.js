@@ -21944,7 +21944,6 @@ async function run() {
 
         // Optionally include some git data in the location metadata
         // used for some rich linking UI
-        const includeGitData = core.getBooleanInput("include-git-metadata");
         const sha = github.context.sha;
         const shortSha = sha.substr(0, 6);
         const url =
@@ -21960,8 +21959,8 @@ async function run() {
           workingDirectory: workingDirectory,
           executablePath: executablePath,
           attribute: attribute,
-          commitHash: includeGitData ? sha : undefined,
-          url: includeGitData ? url : undefined,
+          commitHash: sha,
+          url: url,
         };
 
         const result = await client.updateLocation(locationData);

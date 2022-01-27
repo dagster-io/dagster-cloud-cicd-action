@@ -21942,9 +21942,9 @@ async function run() {
           );
         }
 
-        // Optionally include some experimental git data in the location metadata
+        // Optionally include some git data in the location metadata
         // used for some rich linking UI
-        const includeGitData = core.getBooleanInput("experimental-git-data");
+        const includeGitData = core.getBooleanInput("include-git-metadata");
         const sha = github.context.sha;
         const shortSha = sha.substr(0, 6);
         const url =

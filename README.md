@@ -94,6 +94,7 @@ More examples are provided in the [`example` folder](./example).
 | `location-file` | Path to the `locations.yaml` file defining the code locations to update. Defaults to `/locations.yaml` in the repo root. |
 | `image-tag`     | Tag for the built Docker images, defaults to the first 6 chars of git hash.                                              |
 | `parallel`      | Whether to build and push Docker images in parallel. Defaults to `true`.                                                 |
+| `include-git-metadata`      | Whether to include the commit hash and backlink in created code locations. Defaults to `true`.               |
 
 ### `locations.yaml` Properties
 

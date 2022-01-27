@@ -67,7 +67,7 @@ async function run() {
           workingDirectory: workingDirectory,
           executablePath: executablePath,
           attribute: attribute,
-          sha: includeGitData ? sha : undefined,
+          commitHash: includeGitData ? sha : undefined,
           url: includeGitData ? url : undefined,
         };
 

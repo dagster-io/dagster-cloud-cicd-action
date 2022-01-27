@@ -49,9 +49,7 @@ async function run() {
           );
         }
 
-        // Optionally include some experimental git data in the location metadata
-        // used for some rich linking UI
-        const includeGitData = core.getBooleanInput("experimental-git-data");
+        // Git metadata, used for rich linkbacks
         const sha = github.context.sha;
         const shortSha = sha.substr(0, 6);
         const url =
@@ -67,8 +65,8 @@ async function run() {
           workingDirectory: workingDirectory,
           executablePath: executablePath,
           attribute: attribute,
-          sha: includeGitData ? sha : undefined,
-          url: includeGitData ? url : undefined,
+          commitHash: sha,
+          url: url,
         };
 
         const result = await client.updateLocation(locationData);

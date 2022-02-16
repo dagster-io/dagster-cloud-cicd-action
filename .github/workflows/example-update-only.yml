@@ -1,0 +1,38 @@
+name: Update Only (Custom Build & Push) Example
+on: push
+
+jobs:
+  update-only-example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v1
+
+      # Configure access to ECR, for this example
+      # If you are using another registry, your steps may differ
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      # Here is where any custom build & push process should go
+      - name: Run custom build/push process
+        run: bash ./example/update-only/build_and_push.sh
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+
+      - name: Run Dagster Cloud Update-Only action
+        # Here, use `uses: dagster-io/dagster-cloud-cicd-action/update-only@{version}`
+        # e.g. `uses: dagster-io/dagster-cloud-cicd-action/update-only@v0.2.1`
+        uses: ./update-only
+        with:
+          location-file: ./example/update-only/locations.yaml
+          dagit-url: https://elementl.dogfood.dagster.cloud/dev
+          api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}
+          image-tag: ${{ github.sha }}

@@ -119,6 +119,50 @@ export async function buildDockerImages(
   });
 }
 
+export async function updateLocations(process, client, locations, imageTag) {
+  await core.group("Update workspace locations", async () => {
+    await process(locations, async ([locationName, location]) => {
+      const pythonFile = location["python_file"];
+      const packageName = location["package_name"];
+      const moduleName = location["module_name"];
+      const workingDirectory = location["working_directory"];
+      const executablePath = location["executable_path"];
+      const attribute = location["attribute"];
+
+      if (
+        [pythonFile, packageName, moduleName].filter((x) => !!x).length != 1
+      ) {
+        core.error(
+          `Must provide exactly one of python_file, package_name, or module_name on location ${locationName}.`
+        );
+      }
+
+      // Git metadata, used for rich linkbacks
+      const sha = github.context.sha;
+      const shortSha = sha.substr(0, 6);
+      const url =
+        `https://github.com/${github.context.repo.owner}/` +
+        `${github.context.repo.repo}/tree/${shortSha}/${location["build"]}`;
+
+      const locationData = {
+        name: locationName,
+        image: `${location["registry"]}:${imageTag}`,
+        pythonFile: pythonFile,
+        packageName: packageName,
+        moduleName: moduleName,
+        workingDirectory: workingDirectory,
+        executablePath: executablePath,
+        attribute: attribute,
+        commitHash: sha,
+        url: url,
+      };
+
+      const result = await client.updateLocation(locationData);
+      core.info(`Successfully updated location ${result}`);
+    });
+  });
+}
+
 function getOctokit() {
   const githubToken = core.getInput("github-token");
   const octokit = github.getOctokit(githubToken);

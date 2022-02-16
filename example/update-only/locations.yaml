@@ -1,5 +1,4 @@
 locations:
   github_action_demo_update_only:
-    build: .
     registry: 764506304434.dkr.ecr.us-west-2.amazonaws.com/github-action-demo-minimal
     python_file: repo.py

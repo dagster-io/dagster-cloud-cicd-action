@@ -8,6 +8,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v1
 
+      # Configure access to ECR, for this example
+      # If you are using another registry, your steps may differ
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

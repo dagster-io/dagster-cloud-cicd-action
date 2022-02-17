@@ -1,0 +1,31 @@
+name: 'Dagster Cloud Update'
+description: |
+  'Updates Dagster Cloud code locations that have been built and pushed.'
+branding:
+  icon: 'git-pull-request'
+  color: 'yellow'
+inputs:
+  dagit-url:
+    description: 'Dagster Cloud Dagit URL'
+    required: true
+  api-token:
+    description: 'Cloud Agent API token'
+    required: true
+
+  location-file:
+    description: 'Path to the locations.yaml file defining the repo locations to update'
+    required: true
+    default: 'locations.yaml'
+
+  image-tag:
+    description: 'Tag for the images to deploy'
+    required: true
+
+  parallel:
+    description: 'Whether to update all code locations in parallel'
+    required: false
+    default: true
+
+runs:
+  using: 'node12'
+  main: '../dist/update-only/index.js'

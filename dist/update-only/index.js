@@ -22244,12 +22244,11 @@ const core = __nccwpck_require__(2186);
 const exec = __nccwpck_require__(1514);
 const github = __nccwpck_require__(5438);
 const { DagsterCloudClient } = __nccwpck_require__(9529);
-const { getProcess, getLocations, buildDockerImages, updateLocations } = __nccwpck_require__(1608);
+const { getProcess, getLocations, updateLocations } = __nccwpck_require__(1608);
 
 async function run() {
   try {
-    const imageTag =
-      core.getInput("image-tag") || github.context.sha.substring(0, 6) ;
+    const imageTag = core.getInput("image-tag");
 
     const locationFile = core.getInput("location-file");
 
@@ -22257,15 +22256,6 @@ async function run() {
 
     const parallel = core.getBooleanInput("parallel"); 
     const process = getProcess(parallel);
-
-    await buildDockerImages(process, locationFile, locations, imageTag);
-
-    await core.group("Push Docker image", async () => {
-      await process(locations, async ([_, location]) => {
-        const imageName = `${location["registry"]}:${imageTag}`;
-        await exec.exec("docker", ["push", imageName]);
-      });
-    });
 
     const dagitUrl = core.getInput("dagit-url");
     const endpoint = `${dagitUrl}/graphql`;

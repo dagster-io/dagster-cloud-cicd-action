@@ -8,4 +8,4 @@ file instead of a Dockerfile.
 - [`multiple-locations`](./multiple-locations): An example containing multiple code locations,
 which are built and pushed separately.
 - [`docker-target-stage`](./docker-target-stage): An example which specifies the [Docker target stage](https://docs.docker.com/develop/develop-images/multistage-build/) to build in a multistage Dockerfile.
-- [`update-only`](./update-only): An example which uses the update only action, with a custom build-and-push process. Here, the action is only responsible for notifying Dagster Cloud that a new image is available.
+- [`update-only`](./update-only): An example which uses the update only action, with a custom build-and-push process. Here, the action is only responsible for notifying Dagster Cloud that a new image is available if supplied with the new image's tag.

@@ -28,4 +28,4 @@ inputs:
 
 runs:
   using: 'node12'
-  main: '../dist/deploy/index.js'
+  main: '../dist/update-only/index.js'

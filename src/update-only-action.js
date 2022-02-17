@@ -2,7 +2,7 @@ const core = require("@actions/core");
 const exec = require("@actions/exec");
 const github = require("@actions/github");
 const { DagsterCloudClient } = require("./dagsterCloud");
-const { getProcess, getLocations, buildDockerImages, updateLocations } = require("./utils");
+const { getProcess, getLocations, updateLocations } = require("./utils");
 
 async function run() {
   try {

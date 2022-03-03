@@ -20,6 +20,7 @@ const ADD_LOCATION_MUTATION = gql`
       }
       ... on PythonError {
         message
+        className
         stack
       }
     }
@@ -90,7 +91,11 @@ export class DagsterCloudClient {
     }
 
     if (result.__typename === "PythonError") {
-      throw new Error(result.message);
+      if (result.className === "dagster.core.errors.DagsterUserCodeUnreachableError" ) {
+        console.log(result.message);
+      } else {
+        throw new Error(result.message);
+      }
     }
 
     return result.locationName;

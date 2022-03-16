@@ -22253,7 +22253,8 @@ const {
 
 async function run() {
   try {
-    const imageTag = github.context.sha.substring(0, 6);
+    const commitSha = github.context.payload.pull_request.head.sha;
+    const imageTag = commitSha.substring(0, 6);
 
     const locationFile = core.getInput("location-file");
 
@@ -22274,7 +22275,6 @@ async function run() {
 
       core.info(github.context.pull_request);
 
-      const commitSha = github.context.payload.pull_request.head.sha;
       const codePreview = {
         commitMessage: github.context.payload.pull_request.head.label,
         branchName: github.context.payload.pull_request.head.ref,

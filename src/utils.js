@@ -142,7 +142,7 @@ export async function updateLocations(process, client, locations, imageTag) {
       const shortSha = sha.substr(0, 6);
       const url =
         `https://github.com/${github.context.repo.owner}/` +
-        `${github.context.repo.repo}/tree/${shortSha}/${location["build"]}`;
+        `${github.context.repo.repo}/tree/${shortSha}`;
 
       const locationData = {
         name: locationName,

@@ -114,6 +114,12 @@ Each location specified in the `locations.yaml` can have the following propertie
 
 ## Developing the CI/CD Action
 
+The first time developing against the action, run:
+
+```sh
+npm install
+```
+
 The CI/CD action is run from the packaged files in the `dist/*` folder. When making a change, be sure to repackage the files:
 
 ```sh

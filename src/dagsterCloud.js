@@ -12,11 +12,14 @@ const LIST_LOCATION_QUERY = gql`
 `;
 
 const ADD_LOCATION_MUTATION = gql`
-  mutation ($location: LocationSelector!) {
-    addLocation(location: $location) {
+  mutation ($document: GenericScalar!) {
+    addLocationFromDocument(document: $document) {
       __typename
       ... on WorkspaceEntry {
         locationName
+      }
+      ... on InvalidLocationError {
+        errors
       }
       ... on PythonError {
         message
@@ -27,11 +30,14 @@ const ADD_LOCATION_MUTATION = gql`
 `;
 
 const UPDATE_LOCATION_MUTATION = gql`
-  mutation ($location: LocationSelector!) {
-    updateLocation(location: $location) {
+  mutation ($document: GenericScalar!) {
+    updateLocationFromDocument(document: $document) {
       __typename
       ... on WorkspaceEntry {
         locationName
+      }
+      ... on InvalidLocationError {
+        errors
       }
       ... on PythonError {
         message
@@ -68,27 +74,32 @@ export class DagsterCloudClient {
     });
   }
 
-  async updateLocation(location) {
+  async updateLocation(document) {
     const locationList = await this.gqlClient.request(LIST_LOCATION_QUERY);
     const locationNames = locationList.workspace.workspaceEntries.map(
       (entry) => entry.locationName
     );
 
     let result;
-    if (!locationNames.includes(location.name)) {
-      result = (
+    if (!locationNames.includes(document.location_name)) {
+      const gql_result = (
         await this.gqlClient.request(ADD_LOCATION_MUTATION, {
-          location: location,
+          document: document,
         })
-      ).addLocation;
+      );
+      result = gql_result.addLocationFromDocument;
     } else {
-      result = (
+      const gql_result = (
         await this.gqlClient.request(UPDATE_LOCATION_MUTATION, {
-          location: location,
+          document: document,
         })
-      ).updateLocation;
+      );
+      result = gql_result.updateLocationFromDocument;
     }
 
+    if (result.__typename == "InvalidLocationError") {
+      throw new Error("Invalid location:\n" + result.errors.join("\n"))
+    }
     if (result.__typename === "PythonError") {
       throw new Error(result.message);
     }

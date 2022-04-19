@@ -1,0 +1,33 @@
+name: Example with container context
+on: push
+
+jobs:
+  container-context-example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Cache Docker builds
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+
+      - name: Run Dagster Cloud CI/CD action
+        # Here, use `uses: dagster-io/dagster-cloud-cicd-action/deploy@{version}`
+        # e.g. `uses: dagster-io/dagster-cloud-cicd-action/deploy@v0.2.0`
+        uses: ./deploy
+        with:
+          location-file: ./example/container-context/locations.yaml
+          dagit-url: https://elementl.dogfood.dagster.cloud/dev
+          api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}

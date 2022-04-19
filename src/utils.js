@@ -128,6 +128,7 @@ export async function updateLocations(process, client, locations, imageTag) {
       const workingDirectory = location["working_directory"];
       const executablePath = location["executable_path"];
       const attribute = location["attribute"];
+      const containerContext = location["container_context"]
 
       if (
         [pythonFile, packageName, moduleName].filter((x) => !!x).length != 1
@@ -145,20 +146,25 @@ export async function updateLocations(process, client, locations, imageTag) {
         `${github.context.repo.repo}/tree/${shortSha}`;
 
       const locationData = {
-        name: locationName,
+        location_name: locationName,
+        code_source: {
+          python_file: pythonFile,
+          package_name: packageName,
+          module_name: moduleName,
+        },
         image: `${location["registry"]}:${imageTag}`,
-        pythonFile: pythonFile,
-        packageName: packageName,
-        moduleName: moduleName,
-        workingDirectory: workingDirectory,
-        executablePath: executablePath,
+        working_directory: workingDirectory,
+        executable_path: executablePath,
         attribute: attribute,
-        commitHash: sha,
-        url: url,
+        git: {
+          commit_hash: sha,
+          url: url
+        },
+        container_context: containerContext,
       };
 
       const result = await client.updateLocation(locationData);
-      core.info(`Successfully updated location ${result}`);
+      core.info(`Updated location ${result}.`);
     });
   });
 }

@@ -31,8 +31,6 @@ async function run() {
 
       const client = new DagsterCloudClient(endpoint, apiToken);
 
-      core.info(github.context.pull_request);
-
       const codePreview = {
         commitMessage: github.context.payload.pull_request.head.label,
         branchName: github.context.payload.pull_request.head.ref,

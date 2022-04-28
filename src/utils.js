@@ -25,18 +25,21 @@ function tmpDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), "dagster-cloud-ci"));
 }
 
-async function writeRequirementsDockerfile(baseImage) {
+async function writeRequirementsDockerfile(baseImage, requirementsFiles) {
   const dockerfilePath = path.join(tmpDir(), "Dockerfile");
   const writeFileAsync = util.promisify(fs.writeFile);
+
+  const pipInstall = requirementsFiles.flatMap(file => `
+  COPY ${file} .
+  RUN pip install -r ${file}
+  `
+  ).join()
 
   await writeFileAsync(
     dockerfilePath,
     `
   FROM ${baseImage}
-
-  COPY requirements.txt .
-  RUN pip install -r requirements.txt
-
+  ${pipInstall}
   WORKDIR /opt/dagster/app
 
   COPY . /opt/dagster/app
@@ -83,7 +86,7 @@ export async function buildDockerImages(
           );
         }
 
-        dockerfile = await writeRequirementsDockerfile(baseImage);
+        dockerfile = await writeRequirementsDockerfile(baseImage, [requirementsFile]);
       } else {
         if (baseImage) {
           core.error(

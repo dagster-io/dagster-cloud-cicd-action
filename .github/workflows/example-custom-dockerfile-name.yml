@@ -1,8 +1,8 @@
-name: Minimal Example
+name: Custom Dockerfile Name Example
 on: push
 
 jobs:
-  minimal-example:
+  custom-dockerfile-name-example:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo

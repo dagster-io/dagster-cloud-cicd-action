@@ -21908,6 +21908,13 @@ async function buildDockerImages(
         ]);
       }
 
+      if (location["dockerfile"]) {
+        dockerArguments = dockerArguments.concat([
+          "--file",
+          location["dockerfile"],
+        ]);
+      }
+
       await exec.exec("docker", dockerArguments, { cwd: buildPath });
     });
   });

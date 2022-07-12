@@ -111,6 +111,7 @@ Each location specified in the `locations.yaml` can have the following propertie
 | `attribute`         | (Optional) Specifies either a repository or a function that returns a repository. Can be used when the code contains multiple repositories but only one should be included.                |
 | `base_image`        | If the build directory only contains a `requirements.txt` file and no `Dockerfile`, specifies the base Docker image to use to build the code location.                                     |
 | `target`            | If providing a multistage `Dockerfile`, can be used to specify the [target stage](https://docs.docker.com/develop/develop-images/multistage-build/) to build.                              |
+| `dockerfile`        | Specifies the `Dockerfile` filename to use, if it has a custom name.                              |
 
 ## Developing the CI/CD Action
 

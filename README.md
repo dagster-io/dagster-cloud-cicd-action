@@ -1,5 +1,7 @@
 # Dagster Cloud CI/CD GitHub Action
 
+**This Action is being phased out in favor of our [new set of GitHub Actions](https://github.com/dagster-io/dagster-cloud-action/), for more information see our [Hybrid](https://github.com/dagster-io/dagster-cloud-hybrid-quickstart/) and [Serverless](https://github.com/dagster-io/dagster-cloud-serverless-quickstart/) quickstart repos.**
+
 GitHub Action to update Dagster Cloud code locations, building and pushing Docker images when pipeline code is updated.
 
 ## Quickstart

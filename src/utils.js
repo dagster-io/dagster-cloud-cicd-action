@@ -71,27 +71,36 @@ export async function buildDockerImages(
       const basePath = path.parse(locationFile).dir;
       const buildPath = path.join(basePath, location["build"]);
 
-      let dockerfile = path.join(buildPath, "Dockerfile");
       const baseImage = location["base_image"];
+      let dockerfileArg  = location["dockerfile"];
 
-      if (!fs.existsSync(dockerfile)) {
-        const requirementsFile = path.join(buildPath, "requirements.txt");
-
-        if (!fs.existsSync(requirementsFile) || !baseImage) {
-          core.error(
-            "Supplied build path must either contain Dockerfile, or requirements.txt with base_image"
-          );
+      // There must be either
+      // a Dockerfile specified for the location
+      if (dockerfileArg) {
+        if (!fs.existsSync(path.join(buildPath, dockerfileArg))) {
+          core.error(`No file found at provided dockerfile path: ${dockerfileArg}`)
         }
 
-        dockerfile = await writeRequirementsDockerfile(baseImage);
-      } else {
+      // a Dockerfile next to the location file
+      } else if (fs.existsSync(path.join(buildPath, "Dockerfile"))) {
         if (baseImage) {
           core.error(
             "No need to specify base_image for location if build path contains Dockerfile"
           );
         }
 
-        dockerfile = "./Dockerfile";
+        dockerfileArg = "./Dockerfile";
+      // or a requirements.txt with base_path set for the location
+      } else {
+        const requirementsFile = path.join(buildPath, "requirements.txt");
+
+        if (!fs.existsSync(requirementsFile) || !baseImage) {
+          core.error(
+            "Supplied build path must either contain a Dockerfile, dockerfile set for the location or requirements.txt with base_image"
+          );
+        }
+
+        dockerfileArg = await writeRequirementsDockerfile(baseImage);
       }
 
       const imageName = `${location["registry"]}:${imageTag}`;
@@ -102,7 +111,7 @@ export async function buildDockerImages(
         "--label",
         `sha=${github.context.sha}`,
         "-f",
-        dockerfile,
+        dockerfileArg,
         "-t",
         imageName,
       ];
@@ -111,13 +120,6 @@ export async function buildDockerImages(
         dockerArguments = dockerArguments.concat([
           "--target",
           location["target"],
-        ]);
-      }
-
-      if (location["dockerfile"]) {
-        dockerArguments = dockerArguments.concat([
-          "--file",
-          location["dockerfile"],
         ]);
       }
 

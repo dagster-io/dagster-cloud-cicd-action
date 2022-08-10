@@ -30,6 +30,6 @@ jobs:
         # e.g. `uses: dagster-io/dagster-cloud-cicd-action/deploy@v0.2.2`
         uses: ./deploy
         with:
-          location-file: ./example/minimal/locations.yaml
+          location-file: ./example/custom-dockerfile-name/locations.yaml
           dagit-url: https://elementl.dogfood.dagster.cloud/dev
           api-token: ${{ secrets.DAGSTER_AGENT_TOKEN }}

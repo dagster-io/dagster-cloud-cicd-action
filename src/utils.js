@@ -1,32 +1,31 @@
-const core = require("@actions/core");
-const exec = require("@actions/exec");
-const github = require("@actions/github");
-const fs = require("fs");
-const YAML = require("yaml");
-const path = require("path");
-const os = require("os");
-const util = require("util");
-
+const core = require('@actions/core');
+const exec = require('@actions/exec');
+const github = require('@actions/github');
+const fs = require('fs');
+const YAML = require('yaml');
+const path = require('path');
+const os = require('os');
+const util = require('util');
 
 export async function getLocations(locationFile) {
   const locations = await core
-    .group("Read locations.yaml", async () => {
-      const locationsFile = fs.readFileSync(locationFile, "utf8");
+    .group('Read locations.yaml', async () => {
+      const locationsFile = fs.readFileSync(locationFile, 'utf8');
       return YAML.parse(locationsFile).locations;
     })
     .catch((error) => {
-      core.error(`Error reading locations.yaml: ${error}`, (file = locations));
+      core.error(`Error reading locations.yaml: ${error}`, locations);
     });
 
   return locations;
 }
 
 function tmpDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "dagster-cloud-ci"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'dagster-cloud-ci'));
 }
 
 async function writeRequirementsDockerfile(baseImage) {
-  const dockerfilePath = path.join(tmpDir(), "Dockerfile");
+  const dockerfilePath = path.join(tmpDir(), 'Dockerfile');
   const writeFileAsync = util.promisify(fs.writeFile);
 
   await writeFileAsync(
@@ -40,7 +39,7 @@ async function writeRequirementsDockerfile(baseImage) {
   WORKDIR /opt/dagster/app
 
   COPY . /opt/dagster/app
-    `
+    `,
   );
 
   return dockerfilePath;
@@ -60,90 +59,80 @@ async function inSeries(locations, processingFunction) {
   }
 }
 
-export async function buildDockerImages(
-  process,
-  locationFile,
-  locations,
-  imageTag
-) {
-  await core.group("Build Docker images", async () => {
+export async function buildDockerImages(process, locationFile, locations, imageTag) {
+  await core.group('Build Docker images', async () => {
     await process(locations, async ([_, location]) => {
       const basePath = path.parse(locationFile).dir;
-      const buildPath = path.join(basePath, location["build"]);
+      const buildPath = path.join(basePath, location['build']);
 
-      const baseImage = location["base_image"];
-      let dockerfileArg  = location["dockerfile"];
+      const baseImage = location['base_image'];
+      let dockerfileArg = location['dockerfile'];
 
       // There must be either
       // a Dockerfile specified for the location
       if (dockerfileArg) {
         if (!fs.existsSync(path.join(buildPath, dockerfileArg))) {
-          core.error(`No file found at provided dockerfile path: ${dockerfileArg}`)
+          core.error(`No file found at provided dockerfile path: ${dockerfileArg}`);
         }
 
-      // a Dockerfile next to the location file
-      } else if (fs.existsSync(path.join(buildPath, "Dockerfile"))) {
+        // a Dockerfile next to the location file
+      } else if (fs.existsSync(path.join(buildPath, 'Dockerfile'))) {
         if (baseImage) {
           core.error(
-            "No need to specify base_image for location if build path contains Dockerfile"
+            'No need to specify base_image for location if build path contains Dockerfile',
           );
         }
 
-        dockerfileArg = "./Dockerfile";
-      // or a requirements.txt with base_path set for the location
+        dockerfileArg = './Dockerfile';
+        // or a requirements.txt with base_path set for the location
       } else {
-        const requirementsFile = path.join(buildPath, "requirements.txt");
+        const requirementsFile = path.join(buildPath, 'requirements.txt');
 
         if (!fs.existsSync(requirementsFile) || !baseImage) {
           core.error(
-            "Supplied build path must either contain a Dockerfile, dockerfile set for the location or requirements.txt with base_image"
+            'Supplied build path must either contain a Dockerfile, dockerfile set for the location or requirements.txt with base_image',
           );
         }
 
         dockerfileArg = await writeRequirementsDockerfile(baseImage);
       }
 
-      const imageName = `${location["registry"]}:${imageTag}`;
+      const imageName = `${location['registry']}:${imageTag}`;
 
       let dockerArguments = [
-        "build",
-        ".",
-        "--label",
+        'build',
+        '.',
+        '--label',
         `sha=${github.context.sha}`,
-        "-f",
+        '-f',
         dockerfileArg,
-        "-t",
+        '-t',
         imageName,
       ];
 
-      if (location["target"]) {
-        dockerArguments = dockerArguments.concat([
-          "--target",
-          location["target"],
-        ]);
+      if (location['target']) {
+        dockerArguments = dockerArguments.concat(['--target', location['target']]);
       }
 
-      await exec.exec("docker", dockerArguments, { cwd: buildPath });
+      await exec.exec('docker', dockerArguments, {cwd: buildPath});
     });
   });
 }
 
 export async function updateLocations(process, client, locations, imageTag) {
-  await core.group("Update workspace locations", async () => {
+  await core.group('Update workspace locations', async () => {
     await process(locations, async ([locationName, location]) => {
-      const pythonFile = location["python_file"];
-      const packageName = location["package_name"];
-      const moduleName = location["module_name"];
-      const workingDirectory = location["working_directory"];
-      const executablePath = location["executable_path"];
-      const attribute = location["attribute"];
-      const containerContext = location["container_context"]
+      const pythonFile = location['python_file'];
+      const packageName = location['package_name'];
+      const moduleName = location['module_name'];
+      const workingDirectory = location['working_directory'];
+      const executablePath = location['executable_path'];
+      const attribute = location['attribute'];
+      const containerContext = location['container_context'];
 
-      if (
-        [pythonFile, packageName, moduleName].filter((x) => !!x).length != 1
-      ) {
+      if ([pythonFile, packageName, moduleName].filter((x) => !!x).length != 1) {
         core.error(
-          `Must provide exactly one of python_file, package_name, or module_name on location ${locationName}.`
+          `Must provide exactly one of python_file, package_name, or module_name on location ${locationName}.`,
         );
       }
 
@@ -161,13 +150,13 @@ export async function updateLocations(process, client, locations, imageTag) {
           package_name: packageName,
           module_name: moduleName,
         },
-        image: `${location["registry"]}:${imageTag}`,
+        image: `${location['registry']}:${imageTag}`,
         working_directory: workingDirectory,
         executable_path: executablePath,
         attribute: attribute,
         git: {
           commit_hash: sha,
-          url: url
+          url: url,
         },
         container_context: containerContext,
       };
@@ -179,59 +168,59 @@ export async function updateLocations(process, client, locations, imageTag) {
 }
 
 function getOctokit() {
-  const githubToken = core.getInput("github-token");
+  const githubToken = core.getInput('github-token');
   const octokit = github.getOctokit(githubToken);
 
-  return octokit
+  return octokit;
 }
 
-
 async function findCommentsForEvent() {
-  core.debug("find comments for event");
+  core.debug('find comments for event');
 
-  const octokit = getOctokit()
+  const octokit = getOctokit();
 
-  if (github.context.eventName === "commit") {
+  if (github.context.eventName === 'commit') {
     core.debug('event is "commit", use "listCommentsForCommit"');
     return octokit.rest.repos.listCommentsForCommit({
       ...github.context.repo,
       commit_sha: github.context.sha,
     });
   }
-  if (github.context.eventName === "pull_request") {
+  if (github.context.eventName === 'pull_request') {
     core.debug('event is "pull_request", use "listComments"');
     return octokit.rest.issues.listComments({
       ...github.context.repo,
       issue_number: github.context.issue.number,
     });
   }
-  core.error("not supported event_type");
-  return { data: [] };
+  core.error('not supported event_type');
+  return {data: []};
 }
 
 async function findPreviousComment(text) {
-  const { data: comments } = await findCommentsForEvent();
+  const {data: comments} = await findCommentsForEvent();
 
   const dagsterCloudCodePreviewURLComment = comments.find((comment) =>
-    comment.body.startsWith(text)
+    comment.body.startsWith(text),
   );
   if (dagsterCloudCodePreviewURLComment) {
-    core.info("previous comment found");
+    core.info('previous comment found');
     return dagsterCloudCodePreviewURLComment.id;
   }
-  core.info("previous comment not found");
+  core.info('previous comment not found');
   return null;
 }
 
 export async function createCommentOnCommit(codePreviewId) {
-  const dagitUrl = core.getInput("dagit-url");
-  const commentHeader = "A preview of your Dagster code locations is being automatically created with Dagster Cloud.";
+  const dagitUrl = core.getInput('dagit-url');
+  const commentHeader =
+    'A preview of your Dagster code locations is being automatically created with Dagster Cloud.';
   const commentId = await findPreviousComment(commentHeader);
   const commentBody = `${commentHeader}
 
 ✅ Preview: [${dagitUrl}/preview/${codePreviewId}/workspace](${dagitUrl}/preview/${codePreviewId}/workspace)
   `;
-  const octokit = getOctokit()
+  const octokit = getOctokit();
 
   if (commentId) {
     await octokit.rest.issues.updateComment({

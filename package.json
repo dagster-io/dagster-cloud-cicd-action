@@ -27,7 +27,7 @@
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.0",
     "@actions/github": "^5.1.1",
-    "graphql": "^16.0.1",
+    "graphql": "^16.8.1",
     "graphql-request": "^4.0.0",
     "yaml": "^1.10.2"
   },
